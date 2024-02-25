@@ -5,7 +5,7 @@ controllers:
         namespace: App\Controller
     type: attribute
 
-api_login_check:
+api_login:
     path: /api/login_check
 api_refresh_login:
     path: /api/login_refresh
