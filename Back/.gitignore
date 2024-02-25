@@ -29,3 +29,6 @@
 ###> symfony/asset-mapper ###
 /migrations/
 ###< symfony/asset-mapper ###
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
