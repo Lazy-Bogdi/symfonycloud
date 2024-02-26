@@ -3,7 +3,7 @@
         <form @submit.prevent="login">
             <div>
                 <label for="username">Email:</label>
-                <input id="username" v-model="email" type="email" required>
+                <input id="username" v-model="username" type="email" required>
             </div>
             <div>
                 <label for="password">Password:</label>
@@ -17,9 +17,11 @@
 <script setup>
 import { ref } from 'vue';
 import ApiService from '../services/ApiService';
+import { useAuthStore } from '../stores/auth';
 
-const email = ref('');
+const username = ref('');
 const password = ref('');
+const authStore = useAuthStore();
 
 const login = async () => {
     try {
@@ -28,8 +30,9 @@ const login = async () => {
             username: username.value,
             password: password.value
         });
-        localStorage.setItem('authToken', response.data.token);
-        localStorage.setItem('refreshToken', response.data.refresh_token);
+        let tokens = response.data;
+        // console.log(response.data);
+        authStore.login(tokens);
 
         console.log('Login successful', response.data);
         // Redirect or perform some action after successful login
