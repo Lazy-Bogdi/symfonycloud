@@ -1,6 +1,6 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
-import LoginForm from '../components/LoginForm.vue'; // Adjust the path based on your file structure
+import LoginForm from '../components/LoginForm.vue';
 
 const routes = [
     {
@@ -8,7 +8,16 @@ const routes = [
         name: 'Login',
         component: LoginForm,
     },
-    // Define other routes here
+    {
+        path: '/admin/users',
+        name: 'UserList',
+        component: () => import('../components/admin/UserList.vue')
+    },
+    {
+        path: '/home',
+        name: 'Home',
+        component: () => import('../components/HomePage.vue')
+    },
 ];
 
 const router = createRouter({

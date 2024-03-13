@@ -18,7 +18,9 @@
 import { ref } from 'vue';
 import ApiService from '../services/ApiService';
 import { useAuthStore } from '../stores/auth';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const username = ref('');
 const password = ref('');
 const authStore = useAuthStore();
@@ -35,6 +37,7 @@ const login = async () => {
         authStore.login(tokens);
 
         console.log('Login successful', response.data);
+        router.push({ name: 'Home' });
         // Redirect or perform some action after successful login
     } catch (error) {
         console.error('Login failed', error);

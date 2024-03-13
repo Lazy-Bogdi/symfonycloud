@@ -6,7 +6,7 @@ import ApiService from './services/ApiService';
 import router from './router'
 
 // Replace 'http://localhost:8000/api' with your actual Symfony API base URL
-// ApiService.init('login');
+ApiService.init();
 
 const app = createApp(App);
 app.use(createPinia());
