@@ -32,9 +32,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'user:list', 'user:write'])]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['user:read', 'user:list', 'user:write'])]
-    private ?string $plainPassword = null;
+    // #[ORM\Column(length: 255)]
+    // #[Groups(['user:read', 'user:list', 'user:write'])]
+    // private ?string $plainPassword = null;
 
     public function getId(): ?int
     {
@@ -106,15 +106,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getPlainPassword(): ?string
-    {
-        return $this->plainPassword;
-    }
+    // public function getPlainPassword(): ?string
+    // {
+    //     return $this->plainPassword;
+    // }
 
-    public function setPlainPassword(string $plainPassword): static
-    {
-        $this->plainPassword = $plainPassword;
+    // public function setPlainPassword(string $plainPassword): static
+    // {
+    //     $this->plainPassword = $plainPassword;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 }

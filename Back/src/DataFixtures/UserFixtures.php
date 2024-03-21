@@ -22,16 +22,20 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $user = new User();
-        $user->setEmail('admin@admin.com');
-        // Assuming you have a setPassword method and it requires a hashed password
-        $password = $this->passwordHasher->hashPassword($user, 'admin');
-        $user->setPassword($password);
+        $adminUser = new User();
+        $adminUser->setEmail('admin@admin.com');
+        $password = $this->passwordHasher->hashPassword($adminUser, 'admin');
+        $adminUser->setPassword($password);
+        $adminUser->setRoles(['ROLE_ADMIN']);
 
-        // Add any other properties your User entity might have, like roles
-        $user->setRoles(['ROLE_ADMIN']);
+        $casualUser = new User();
+        $casualUser->setEmail('casual@casual.com');
+        $password = $this->passwordHasher->hashPassword($casualUser, 'casual');
+        $casualUser->setPassword($password);
+        $casualUser->setRoles(['ROLE_USER']);
 
-        $manager->persist($user);
+        $manager->persist($adminUser);
+        $manager->persist($casualUser);
         $manager->flush();
     }
 }
