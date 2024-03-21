@@ -32,7 +32,7 @@ const ApiService = {
     },
 
     get(resource) {
-        console.log(redaxios.defaults)
+        // console.log(redaxios.defaults)
         return redaxios.get(resource,{ headers: getAuthHeaders() });
     },
 

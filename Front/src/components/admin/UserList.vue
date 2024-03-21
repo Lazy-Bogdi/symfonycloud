@@ -4,11 +4,13 @@
         <ul>
             <li v-for="user in users" :key="user.id">
                 {{ user.email }} - {{ user.roles.join(', ') }}
-                <!-- Add buttons or links for editing and deleting users -->
+                <!-- Link to the user's details page -->
+                <router-link :to="{ name: 'UserDetails', params: { id: user.id } }">View Details</router-link>
             </li>
         </ul>
     </div>
 </template>
+
 
 <script setup>
 import { onMounted, ref } from 'vue';
@@ -20,7 +22,7 @@ onMounted(async () => {
     try {
         // ApiService.init();
         const response = await ApiService.get('/admin/users');
-        console.log(response)
+        // console.log(response)
         users.value = response.data;
         // console.log(users.value)
     } catch (error) {
