@@ -13,7 +13,7 @@
         </form>
     </div>
 </template>
-  
+
 <script setup>
 import { ref } from 'vue';
 import ApiService from '../services/ApiService';
@@ -37,6 +37,10 @@ const login = async () => {
         authStore.login(tokens);
 
         console.log('Login successful', response.data);
+        const redirectPath = router.currentRoute.value.query.redirect || false;
+        if(redirectPath != false){
+            router.push(redirectPath);
+        }        
         router.push({ name: 'Home' });
         // Redirect or perform some action after successful login
     } catch (error) {

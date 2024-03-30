@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia';
+// import { useRouter } from 'vue-router';
+import router from '../router';
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -18,6 +20,8 @@ export const useAuthStore = defineStore('auth', {
             this.token = null;
             localStorage.removeItem('authToken');
             localStorage.removeItem('refreshToken');
+            // const router = useRouter();
+            router.push({ name: 'Login' });
             // Here, you might also want to reset your API service to remove the token
         },
         // Optionally, add a method to refresh the token

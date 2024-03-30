@@ -1,75 +1,106 @@
 import redaxios from 'redaxios';
+import { useRouter } from 'vue-router';
 
 function getAuthHeaders() {
     const token = localStorage.getItem('authToken');
     return {
-        'Authorization': token ? `Bearer ${token}` : undefined, // Only set Authorization if token exists
+        'Authorization': token ? `Bearer ${token}` : undefined,  // Only set Authorization if token exists
         'Content-Type': 'application/json'
     };
 }
+
 const ApiService = {
     init() {
-        // Set the base URL once during initialization
         redaxios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
-
-        // Ensure headers and common objects are initialized
-        // if (!redaxios.defaults.headers) {
-        //     redaxios.defaults.headers = {};
-        // }
-        // if (!redaxios.defaults.headers.common) {
-        //     redaxios.defaults.headers.common = {};
-        // }
-
-        // this.setAuthHeader();
     },
 
-    setAuthHeader() {
-        const token = localStorage.getItem('authToken');
-        return {
-            'Authorization': token ? `Bearer ${token}` : undefined, // Only set Authorization if token exists
-            'Content-Type': 'application/json'
+
+    async makeRequest(method, resource, data = null, skipRefresh = false) {
+        const config = {
+            method: method,
+            url: resource,
+            data: data,
+            headers: !skipRefresh ? getAuthHeaders() : null
         };
+
+        try {
+            return await redaxios(config);
+        } catch (error) {
+            // console.log(1, skipRefresh)
+            if (!skipRefresh && error && error.status === 401) {
+                // console.log(2, skipRefresh)
+                // Only attempt to refresh the token if we're not already trying to refresh it
+                const newToken = await this.refreshToken();
+                // console.log(newToken)
+                if (newToken) {
+                    config.headers = getAuthHeaders(); // Fetch headers again as they will now contain the new token
+                    return await redaxios(config);
+                } else {
+                    throw new Error('Unauthorized - Unable to refresh token');
+                }
+            } else {
+                // Rethrow the error if it's not a 401 or if we're skipping refresh
+                throw error;
+            }
+        }
     },
 
     get(resource) {
-        // console.log(redaxios.defaults)
-        return redaxios.get(resource,{ headers: getAuthHeaders() });
+        console.log(resource)
+        return this.makeRequest('get', resource);
     },
 
     post(resource, data) {
-        return redaxios.post(resource, data, { headers: getAuthHeaders() });
+        return this.makeRequest('post', resource, data);
     },
 
     put(resource, data) {
-        return redaxios.put(resource, data, { headers: getAuthHeaders() });
+        return this.makeRequest('put', resource, data);
     },
 
     delete(resource) {
-        return redaxios.delete(resource,{ headers: getAuthHeaders() });
+        return this.makeRequest('delete', resource);
     },
 
     async login(resource, data) {
-        // this.init()
-        const response = await redaxios.post(resource, data, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        // if (response.data.token) {
-        //     this.setAuthHeader();
-        // }
+        const response = await this.post(resource, data);
+        if (response.data.token && response.data.refreshToken) {
+            localStorage.setItem('authToken', response.data.token);
+            localStorage.setItem('refreshToken', response.data.refreshToken);
+        }
         return response;
     },
 
     logout() {
-        // localStorage.removeItem('authToken');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
         delete redaxios.defaults.headers.common['Authorization'];
-        // You might want to redirect the user to the login page or perform other cleanup actions here.
     },
 
+    handleRefreshTokenFailure() {
+        // Clear user session
+        this.logout();
+        // Use Vue Router to redirect to login page, appending the current path as query param
+        const router = useRouter();
+        router.push({ name: 'Login', query: { redirect: router.currentRoute.value.fullPath } });
+    },
 
-    // Add other methods here (post, put, delete, etc.) as needed
+    async refreshToken() {
+        try {
+            const response = await this.makeRequest('post', '/token/refresh', { refresh_token: localStorage.getItem('refreshToken') }, true);  // Note the 'true' at the end
+            if (response.data.token) {
+                localStorage.setItem('authToken', response.data.token);
+                return response.data.token;
+            } else {
+                this.handleRefreshTokenFailure();
+                return null;
+            }
+        } catch (error) {
+            // console.log(error);
+            this.handleRefreshTokenFailure();
+            return null;
+        }
+    },
 };
 
 export default ApiService;
