@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -31,6 +33,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     #[Groups(['user:read', 'user:list', 'user:write'])]
     private ?string $password = null;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: MyFile::class)]
+    private Collection $ownedFiles;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Directory::class)]
+    private Collection $ownedDirectories;
+
+    public function __construct()
+    {
+        $this->ownedFiles = new ArrayCollection();
+        $this->ownedDirectories = new ArrayCollection();
+    }
 
     // #[ORM\Column(length: 255)]
     // #[Groups(['user:read', 'user:list', 'user:write'])]
@@ -117,4 +131,64 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     //     return $this;
     // }
+
+    /**
+     * @return Collection<int, MyFile>
+     */
+    public function getOwnedFiles(): Collection
+    {
+        return $this->ownedFiles;
+    }
+
+    public function addOwnedFile(MyFile $ownedFile): static
+    {
+        if (!$this->ownedFiles->contains($ownedFile)) {
+            $this->ownedFiles->add($ownedFile);
+            $ownedFile->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnedFile(MyFile $ownedFile): static
+    {
+        if ($this->ownedFiles->removeElement($ownedFile)) {
+            // set the owning side to null (unless already changed)
+            if ($ownedFile->getOwner() === $this) {
+                $ownedFile->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Directory>
+     */
+    public function getOwnedDirectories(): Collection
+    {
+        return $this->ownedDirectories;
+    }
+
+    public function addOwnedDirectory(Directory $ownedDirectory): static
+    {
+        if (!$this->ownedDirectories->contains($ownedDirectory)) {
+            $this->ownedDirectories->add($ownedDirectory);
+            $ownedDirectory->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnedDirectory(Directory $ownedDirectory): static
+    {
+        if ($this->ownedDirectories->removeElement($ownedDirectory)) {
+            // set the owning side to null (unless already changed)
+            if ($ownedDirectory->getOwner() === $this) {
+                $ownedDirectory->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
 }
