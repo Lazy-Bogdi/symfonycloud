@@ -26,7 +26,7 @@ security:
             entry_point: jwt
             jwt: ~
             refresh_jwt:
-                check_path: /api/login_refresh # or, you may use the `api_refresh_token` route name
+                check_path: /api/token/refresh # or, you may use the `api_refresh_token` route name
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -42,7 +42,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/(login|token_refresh), roles: PUBLIC_ACCESS }
+        - { path: ^/api/(login|token/refresh), roles: PUBLIC_ACCESS }
         - { path: ^/api/admin, roles: ROLE_ADMIN }
         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }        
 
