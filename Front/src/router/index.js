@@ -22,9 +22,10 @@ const routes = [
         meta: { requiresAuth: true }  // Assuming user details also require authentication
     },    
     {
-        path: '/home',
+        path: '/',
         name: 'Home',
-        component: () => import('../components/HomePage.vue')
+        component: () => import('../components/HomePage.vue'),
+        meta: { requiresAuth: true }
     },
 ];
 
